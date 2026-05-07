@@ -2,7 +2,7 @@ import express from "express";
 
 import {getme, login, registeruser,verifyemail, forgotPassword,resetPassword} from "../controlleres/authcontrollers.js";
 
-import { authmiddleware, authorizeRoles } from "../middlewares/authmiddlewares.js";
+import {authorize, protect } from "../middlewares/authmiddlewares.js";
 
 const authRouter = express.Router();
 
@@ -22,7 +22,7 @@ authRouter.post("/forgot-password", forgotPassword);
 authRouter.post("/reset-password/:token", resetPassword);
 
 // Get Logged In User
-authRouter.get("/me", authmiddleware, getme);
+authRouter.get("/me", protect, getme);
 
 
 export default authRouter;

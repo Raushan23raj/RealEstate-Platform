@@ -3,7 +3,7 @@ import { User } from "../models/usermodels.js";
 import { ApiError } from "../utils/ApiError.js";
 
 
-export const authmiddleware = async (req, res, next) => {
+export const protect = async (req, res, next) => {
       try {
             const token = req.header("Authorization")?.replace("Bearer ", "");
 
@@ -35,7 +35,7 @@ export const authmiddleware = async (req, res, next) => {
 };
 
 // Role Based
-export const authorizeRoles = (...roles) => {
+export const authorize = (...roles) => {
       return (req, res, next) => {
 
             if (!roles.includes(req.user.role)) {
