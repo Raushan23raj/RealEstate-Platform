@@ -1,17 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React from 'react'
+import { Route } from 'react-router-dom'
+import { Routes } from 'react-router-dom'
+import Landingpages from './pages/shared/landingpages.jsx'
 
 function App() {
   return (
     <div>
-      <h1 className='text-3xl font-bold underline'>
-        Hello world
-      </h1>
-     </div>
-   )
+      <Routes>
+        <Route path='/' element={<Landingpages />} />
+      </Routes>
+    </div>
+  )
 }
 
 export default App

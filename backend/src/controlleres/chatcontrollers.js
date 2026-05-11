@@ -1,4 +1,4 @@
-import Chat from "../models/chatModel.js";
+import Chat from "../models/chatmodels.js";
 
 //crete chat or get existing chat
 export const createChat = async (req, res) => {
@@ -38,7 +38,7 @@ export const createChat = async (req, res) => {
                   .populate("buyer", "name email")
                   .populate("seller", "name email")
                   .populate("property", "title price images")
-            
+
             return res.status(200).json({
                   success: true,
                   chat
@@ -111,7 +111,7 @@ export const getUserChats = async (req, res) => {
             const chats = await Chat.find({
                   $or: [
                         { buyer: userId },
-                        { seller: userId}
+                        { seller: userId }
                   ]
             })
                   .populate("buyer", "name email")
@@ -140,8 +140,8 @@ export const getSingleChat = async (req, res) => {
 
             const chat = await Chat.findById(req.params.chatId)
                   .populate(
-                  "message: sender", 
-                  "name profilePic"
+                        "message: sender",
+                        "name profilePic"
                   );
 
             if (!chat) {
@@ -153,7 +153,7 @@ export const getSingleChat = async (req, res) => {
             const userId = req.user._id.toString();
             if (chat.buyer.toString !== userId && chat.seller.toString() != userId) {
                   return res.status(403).json({
-                        message:"Your are not authorized"
+                        message: "Your are not authorized"
                   })
             }
             return res.status(200).json({
@@ -177,7 +177,7 @@ export const deleteEntireChat = async (req, res) => {
 
             if (!chats) {
                   return res.status(404).json({
-                        message:"chat not found"
+                        message: "chat not found"
                   })
             }
             if (chat.buyer.toString() !== userId.toString && chat.seller.toString() !== userId.toString()) {
@@ -187,7 +187,7 @@ export const deleteEntireChat = async (req, res) => {
             }
             await chat.findByIdAndDelete(req.params.chatId);
             res.json({
-                  message:"chat deleted successfully"
+                  message: "chat deleted successfully"
             })
 
       } catch (error) {
@@ -212,18 +212,18 @@ export const specificChat = async (req, res) => {
             const message = chat.message.id(req.params.message);
             if (!message) {
                   return res.status(404).json({
-                        message:"Message not found"
+                        message: "Message not found"
                   })
             }
             if (message.sender.toString() != userId.toString()) {
                   return res.status(403).json({
-                        message:"Not Authorised to delete this message"
+                        message: "Not Authorised to delete this message"
                   })
             }
             chat.message.pull(req.params.messageId);
             await chat.save();
             res.json({ meassage: "Message deleted successfully!", chat });
- 
+
       } catch (error) {
             return res.status(500).json({
                   success: false,
