@@ -9,7 +9,7 @@ import authRouter from './routes/authroutes.js';
 import userRouter from './routes/userroutes.js';
 import propertyRouter from './routes/propertyroutes.js';
 import inquiryRouter from './routes/inquiryroutes.js';
-import WhishlistRouter from './routes/whishlistroutes.js';
+import WishlistRouter from './routes/wishlistroutes.js';
 import contactRouter from './routes/contactroutes.js';
 import adminRouter from './routes/adminroutes.js';
 import chatRouter from './routes/chatroutes.js';
@@ -24,7 +24,10 @@ await connectDB();
 
 //middlewares
 const allowedOrigins = [
-      "http://localhost:5173"
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:4173",
+      "http://127.0.0.1:4173"
 ].filter(Boolean);
 
 app.use(cors({
@@ -53,7 +56,7 @@ app.use("/api/property", propertyRouter);
 
 app.use("/api/inquiry", inquiryRouter);
 
-app.use("/api/whishlist", WhishlistRouter);
+app.use("/api/wishlist", WishlistRouter);
 
 app.use("/api/contact", contactRouter);
 
@@ -81,7 +84,19 @@ io.on("connection", (socket) => {
 })
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT || 5000);
+
+httpServer.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+            console.error(
+                  `Port ${PORT} is already in use. The backend is likely already running in another terminal.`
+            );
+            console.error("Stop the existing process or choose a different PORT before starting again.");
+            process.exit(1);
+      }
+
+      throw error;
+});
 
 httpServer.listen(PORT, () => {
       console.log(`server is running on http://localhost:${PORT}`)

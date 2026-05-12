@@ -28,7 +28,7 @@ const Navbar = () => {
                               <Link to="/properties" className={s.navLink} onClick={() => setIsOpen(false)}>
                                     Properties
                               </Link>
-                              <Link to="/whishList" className={s.navLink} onClick={() => setIsOpen(false)}>
+                              <Link to="/wishlist" className={s.navLink} onClick={() => setIsOpen(false)}>
                                     Wishlist
                               </Link>
                               <Link to="/chat" className={s.navLink} onClick={() => setIsOpen(false)}>
@@ -120,9 +120,9 @@ const Navbar = () => {
                                           </div>
                                     </div>
                                     <button onClick={logout} className={s.drawerLogoutButton}>
-                                      Logout
+                                          Logout
                                     </button>
-                                    </div>
+                              </div>
 
                         )}
                   </div>

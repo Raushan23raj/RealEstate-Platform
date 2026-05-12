@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { landingPageStyles as s } from '../../assets/dummyStyles.js'
 import Navbar from "../../components/common/Navbar.jsx";
-import { HiHome, HiLocationMarker, HiOfficeBuilding, HiShieldCheck, HiLightningBolt, HiCurrencyDollar, HiVideoCamera, HiSearch } from "react-icons/hi";
+import { HiHome, HiOfficeBuilding, HiShieldCheck, HiLightningBolt, HiCurrencyDollar, HiVideoCamera, HiSearch, HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authcontext.jsx";
 import API_URL from "../../config.js";
 import axios from "axios";
 import banner from '../../assets/bannerimage.png'
-import PropertyCard from "../../components/common/PropertyCard.jsx";
+import PropertyCard from "../../components/common/PropertyCard";
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTwitter } from "react-icons/fa"
+import logo from "../../assets/image.png"
 
 const Landingpages = () => {
       const navigate = useNavigate();
@@ -23,67 +25,46 @@ const Landingpages = () => {
             penthouse: 0,
             commercial: 0
       });
-      const [whishlistedIds, setWhishlistedIds] = useState([]);
+      const [wishlistedIds, setWishlistedIds] = useState([]);
 
       useEffect(() => {
             fetchProperties();
             fetchCounts();
             if (user) {
-                  fetchWhishlist();
+                  fetchWishlist();
             }
       }, [user]);
-      const fetchWhishlist = async () => {
+      const fetchWishlist = async () => {
             try {
-                  const res = await axios.get(`${API_URL}/api/whishlist`, {
-                        headers: { Authorization: `Bearer ${token}` }
+                  const res = await axios.get(`${API_URL}/api/wishlist`, {
+                        headers: { Authorization: `Bearer ${token}` },
                   });
-                  setWhishlistedIds(
+                  setWishlistedIds(
                         res.data
                               .filter((item) => item.property)
-                        .map((item) => String(item.property._id)),
-                   )
-                  // const wishlistItems = Array.isArray(res.data) ? res.data : [];
-                  // const wishlistIds = [];
-
-                  // for (const item of wishlistItems) {
-                  //       if (item && item.property && item.property._id) {
-                  //             wishlistIds.push(String(item.property._id));
-                  //       }
-                  // }
-
-                  // setWhishlistedIds(wishlistIds);
+                              .map((item) => String(item.property._id))
+                  );
 
             } catch (error) {
                   console.error("Failed to fetch whishlist", error);
             }
       };
-      //to remove a whishlist
-      const handleToggleWhishlist = async (propertyId) => {
+      // to remove a wishlist
+      const handleToggleWishlist = async (propertyId) => {
             try {
-                  const isWhislisted = whishlistedIds.includes(propertyId);
-                  if (isWhislisted) {
-                        await axios.delete(
-                              `${API_URL}/api/whishlist/${propertyId}`,
-                              {
-                                    headers: {
-                                          Authorization: `Bearer ${token}`,
-                                    },
-                              });
-                        setWhishlistedIds((prev) =>
-                              prev.filter((id) => id !== propertyId)
-                        );
-                  }
-                  else {
+                  const isWishlisted = wishlistedIds.includes(propertyId);
+                  if (isWishlisted) {
+                        await axios.delete(`${API_URL}/api/wishlist/${propertyId}`, {
+                              headers: { Authorization: `Bearer ${token}` },
+                        });
+                        setWishlistedIds((prev) => prev.filter((id) => id !== propertyId));
+                  } else {
                         await axios.post(
-                              `${API_URL}/api/whishlist/${propertyId}`,
+                              `${API_URL}/api/wishlist/${propertyId}`,
                               {},
-                              {
-                                    headers: {
-                                          Authorization: `Bearer ${token}`,
-                                    },
-                              }
+                              { headers: { Authorization: `Bearer ${token}` } }
                         );
-                        setWhishlistedIds((prev) => [...prev, propertyId]);
+                        setWishlistedIds((prev) => [...prev, propertyId]);
                   }
 
 
@@ -95,9 +76,9 @@ const Landingpages = () => {
       // to fetch count
       const fetchCounts = async () => {
             try {
-                  const res = await axios.get(`${API_URL}/api/property/count`);
+                  const res = await axios.get(`${API_URL}/api/property/counts`);
                   if (res.data.success) {
-                        setPropertyCounts(res.data.counts);
+                        setPropertyCounts(res.data.counts || res.data.count || {});
                   }
             } catch (error) {
                   console.error("Failed to fetch property counts", error);
@@ -116,13 +97,16 @@ const Landingpages = () => {
                   setError(null);
 
             } catch (error) {
-                  setError("Failed to load properties");
+                  console.error("Failed to load properties", error, error?.response?.data);
+                  const serverMessage =
+                        error?.response?.data?.message || error?.response?.data || error.message;
+                  setError(`Failed to load properties: ${serverMessage}`);
             } finally {
                   setLoading(false);
             }
       };
 
-      
+
 
       const handleSearch = (e) => {
             e.preventDefault();
@@ -135,25 +119,25 @@ const Landingpages = () => {
       const categories = [
             {
                   name: "Modern Flats",
-                  count: propertyCounts.flat || 0,
+                  count: propertyCounts?.flat || 0,
                   icon: <HiOfficeBuilding size={32} />,
                   type: "flat",
             },
             {
                   name: "Luxury Villas",
-                  count: propertyCounts.villa || 0,
+                  count: propertyCounts?.villa || 0,
                   icon: <HiHome size={32} />,
                   type: "villa",
             },
             {
                   name: "Penthouse",
-                  count: propertyCounts.penthouse || 0,
+                  count: propertyCounts?.penthouse || 0,
                   icon: <HiOfficeBuilding size={32} />,
                   type: "penthouse",
             },
             {
                   name: "Commercial",
-                  count: propertyCounts.commercial || 0,
+                  count: propertyCounts?.commercial || 0,
                   icon: <HiOfficeBuilding size={32} />,
                   type: "commercial",
             },
@@ -255,7 +239,7 @@ const Landingpages = () => {
                                     <img src={banner} alt="banner" className={s.heroImage} />
                                     <div className={s.verifiedBadge}>
                                           <div className={s.badgeIconWrapper}>
-                                                <HiShieldCheck size={24} className="text-primary"/>
+                                                <HiShieldCheck size={24} className="text-primary" />
                                           </div>
                                           <div>
                                                 <h4 className={s.badgeTitle}>Verified Listing</h4>
@@ -320,13 +304,13 @@ const Landingpages = () => {
                                                 "24/7 Premium customer support",
                                           ].map((item, idx) => (
                                                 <li key={idx} className={s.listItem}>
-                                                      <HiLightningBolt className="text-primary"/>{item}
-                                                      </li>
-                                          ))}                             
+                                                      <HiLightningBolt className="text-primary" />{item}
+                                                </li>
+                                          ))}
                                     </ul>
                                     <a href="#process" className={s.learnMoreLink}>
                                           Learn more about our process &rarr;
-                              </a>
+                                    </a>
                               </div>
                         </div>
                   </section>
@@ -369,7 +353,7 @@ const Landingpages = () => {
                                                 <h3 className={s.processCardTitle}>{p.title}</h3>
                                                 <p className={s.processCardDesc}>{p.desc}</p>
                                           </div>
-            ))}
+                                    ))}
 
                               </div>
                         </div>
@@ -387,28 +371,143 @@ const Landingpages = () => {
                                           <div className={s.loader}></div>
                                     </div>
                               ) : error ? (
-                                          <div className={s.errorContainer}>
-                                                <p>{error}</p>
-                                          </div>
-                                    ) : (
-                                                <div className={s.propertiesGrid}>
-                                                      {properties
-                                                            .filter((p) => p)
-                                                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                                                            .slice(0, 6)
-                                                            .map((property) => (
-                                                                  <PropertyCard
-                                                                        key={property._id}
-                                                                        property={property}
-                                                                        isWishlisted={wishlistedIds.includes(String(property._id))}
-                                                                        onToggleWishlist={handleToggleWishlist}
-                                                                  />
-                                                            ))}
-                                                </div>
-                              )
-                        } 
+                                    <div className={s.errorContainer}>
+                                          <p>{error}</p>
+                                    </div>
+                              ) : (
+                                    <div className={s.propertiesGrid}>
+                                          {properties
+                                                .filter((p) => p)
+                                                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                                                .slice(0, 6)
+                                                .map((property) => (
+                                                      <PropertyCard
+                                                            key={property._id}
+                                                            property={property}
+                                                            isWishlisted={wishlistedIds.includes(String(property._id))}
+                                                            onToggleWishlist={handleToggleWishlist}
+                                                      />
+                                                ))}
+                                    </div>
+                              )}
+                              <div className={s.discoverButtonContainer}>
+                                    <button onClick={() => navigate("/properties")} className={s.discoverButton}>
+                                          Discover More Properties
+                                    </button>
+                              </div>
                         </div>
                   </section>
+                  {/* footer */}
+                  <footer className={s.footer}>
+                        <div className={s.container}>
+                              <div className={s.footerMainGrid}>
+                                    <div className={s.footerBrand}>
+                                          <div className={s.brandLogo}>
+                                                <div className={s.brandIcon}>RE</div>
+                                                RealEstate
+                                          </div>
+                                          <p className={s.brandDesc}>
+                                                The most truested platform for buying, selling, and renting
+                                                premium real estate globally. we make property hunting seamless.
+                                          </p>
+                                          <div className={s.socialIcons}>
+                                                {[FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn].map(
+                                                      (Icon, idx) => (
+                                                            <a href="#" key={idx} className={s.socialIcon}>
+                                                                  <Icon size={16} />
+                                                            </a>
+                                                      ),
+                                                )}
+                                          </div>
+                                    </div>
+                                    <div>
+                                          <h4 className={s.footerHeading}>Company</h4>
+                                          <ul className={s.footerLinks}>
+                                                <li>
+                                                      <a href="/" className={s.footerLink}>
+                                                            Home
+                                                      </a>
+                                                </li>
+                                                <li>
+                                                      <a href="/properties" className={s.footerLink}>
+                                                            Property
+                                                      </a>
+                                                </li>
+                                                <li>
+                                                      <a href="/wishlist" className={s.footerLink}>
+                                                            Wishlist
+                                                      </a>
+                                                </li>
+                                                <li>
+                                                      <a href="/contact" className={s.footerLink}>
+                                                            Contact
+                                                      </a>
+                                                </li>
+                                          </ul>
+                                    </div>
+
+                                    {/* Column 3: Contact Info */}
+                                    <div>
+                                          <h4 className={s.footerHeading}>Support</h4>
+                                          <ul className={s.footerLinks}>
+                                                <li className={s.contactInfo}>
+                                                      <HiMail className="text-primary text-xl" />{" "}
+                                                      contact@reestate.com
+                                                </li>
+                                                <li className={s.contactInfo}>
+                                                      <HiPhone className="text-primary text-xl" /> +91 1234567890
+                                                </li>
+                                                <li className={s.contactInfoStart}>
+                                                      <HiLocationMarker
+                                                            className={`text-primary ${s.contactIcon}`}
+                                                      />
+                                                      123 Business Hub, India
+                                                </li>
+                                          </ul>
+                                    </div>
+                              {/* column 4 */}
+                              <div>
+                                    <h4 className={s.footerHeading}>Newsletter</h4>
+                                    <p className={s.newsletterDesc}>
+                                          Subscribe to get the latest listing and market insights
+                                          directly in your inbox.
+                                    </p>
+                                    <div className={s.newsletterInputWrapper}>
+                                          <input
+                                                type="email"
+                                                placeholder="Enter Your Email"
+                                                className={s.newsletterInput} />
+                                          <button className={s.newsletterButton}>Join</button>
+                                    </div>
+                                    </div>
+                              </div>
+                              {/*bottom bar */}
+                              <div className={s.bottomBar}>
+                                    <div className={s.bottomBarFlex}>
+                                          <p>
+                                                &copy; {new Date().getFullYear()} RealEstate. All rights reserved.
+                                          </p> 
+                                          <div className={s.footerLegalLinks}>
+                                                <a href="#" className={s.footerLink}>
+                                                      Privacy Policy
+                                                </a>
+                                                <a href="#" className={s.footerLink}>
+                                                      Terms of Services
+                                                </a>
+                                                <a href="#" className={s.footerLink}>
+                                                      Cookies Settings
+                                                </a>
+                                          </div>
+                                    </div>
+                                    {/* done after some time */}
+                                    {/* <div className={s.designCredit}>
+                                          <img src={logo} alt="logo" className={s.designLogo} />
+                                          <span className="text-text-muted">Designed By</span>
+                                          <a href="#"></a>
+                                  </div>  */}
+                              </div>
+                        </div>
+                  </footer>
             </div>
 
       )

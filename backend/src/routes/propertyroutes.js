@@ -22,9 +22,9 @@ propertyRouter.patch("/:id/status", protect, authorize("seller"), updateproperty
 
 propertyRouter.get("/counts", getPropetyCounts);
 
-propertyRouter.get("/:id", getpropertydetails);
-
 propertyRouter.get("/seller/dashboard", protect, authorize("seller"), getsellerdashboard);
+
+propertyRouter.get("/:id", getpropertydetails);
 
 export default propertyRouter;
 
