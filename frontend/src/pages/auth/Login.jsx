@@ -32,9 +32,7 @@ const Login = () => {
             const result = await login(formData.email, formData.password);
 
             if (result.success) {
-                  const storedUser = JSON.parse(
-                        localStorage.getItem("user") || sessionStorage.getItem("user"),
-                  );
+                  const storedUser = result.user;
                   if (storedUser?.role === "admin") {
                         navigate("/admin-dashboard");
                   }else if (storedUser?.role === "seller") {

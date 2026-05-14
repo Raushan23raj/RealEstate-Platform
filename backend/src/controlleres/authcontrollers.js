@@ -80,9 +80,11 @@ export const login = async (req, res) => {
 
             //token
             const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
+            const safeUser = user.toObject();
+            delete safeUser.password;
             
             return res.status(200).json(
-                  new ApiResponse(200, { token, user }, "Login successfully")
+                  new ApiResponse(200, { token, user: safeUser }, "Login successfully")
             );
             
       } catch (error) {

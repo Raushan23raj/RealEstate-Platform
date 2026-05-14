@@ -93,7 +93,8 @@ const Landingpages = () => {
                   const res = await axios.get(
                         `${API_URL}/api/property?city=${searchTerm}`);
 
-                  setProperties(res.data.properties || res.data || []);
+                  const propertyList = res.data?.properties || res.data;
+                  setProperties(Array.isArray(propertyList) ? propertyList : []);
                   setError(null);
 
             } catch (error) {

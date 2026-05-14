@@ -107,7 +107,7 @@ const Navbar = () => {
                         {user && (
                               <div className={s.drawerUserSection}>
                                     <div className={s.drawerUserInfo}>
-                                          <img ssrc={
+                                          <img src={
                                                 user.profilePic ||
                                                 `https://ui-avatars.com/api/?name=${user.name}&background=0d6e59&color=fff`
                                           }
@@ -115,8 +115,8 @@ const Navbar = () => {
                                                 className={s.drawerAvatar}
                                           />
                                           <div>
-                                                <div className={s.drawerUserName}>{User.name}</div>
-                                                <div className={s.drawerUserEmail}>{User.emial}</div>
+                                                <div className={s.drawerUserName}>{user.name}</div>
+                                                <div className={s.drawerUserEmail}>{user.email}</div>
                                           </div>
                                     </div>
                                     <button onClick={logout} className={s.drawerLogoutButton}>
@@ -131,3 +131,4 @@ const Navbar = () => {
 }
 
 export default Navbar
+

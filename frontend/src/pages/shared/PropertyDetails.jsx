@@ -6,6 +6,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import API_URL from '../../config';
 import axios from 'axios';
 import { HiBadgeCheck, HiCalendar, HiChatAlt, HiChevronLeft, HiChevronRight, HiCollection, HiHeart, HiLocationMarker, HiOutlineHeart, HiOutlineHome, HiOutlineUserGroup, HiOutlineViewGrid } from 'react-icons/hi';
+import PropertyCard from '../../components/common/PropertyCard';
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -36,7 +37,7 @@ const PropertyDetails = () => {
                               headers: token ? { Authorization: `Bearer ${token}` } : {},
                         });
                         setProperty(res.data.property);
-                        setSimilarProperties(res.data.similarProperties || []);
+                        setSimilarProperties(res.data.similarProperties || res.data.similarproperties || []);
 
                         if (user && user.role === "buyer") {
                               const wishRes = await axios.get(`${API_URL}/api/wishlist`, {
@@ -489,7 +490,7 @@ const PropertyDetails = () => {
                           </div>
                           <div className={s.similarGrid}>
                                 {similarProperties.length > 0 ? (
-                                      similarProperties.slice(0, 3).map((p) => <propertyCard
+                                      similarProperties.slice(0, 3).map((p) => <PropertyCard
                                       key = {p._id} property={p}
                                       />)
                                 ) : (

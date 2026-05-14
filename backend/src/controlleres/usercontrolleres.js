@@ -6,8 +6,8 @@ import { uploadtocloudinary } from "../utils/uploadcloudniary.js";
 //getprofile
 export const getprofile = async (req, res) => {
       try {
-            const user = await User.findById(req.user._id).selecting("-password");
-             res.staus(200).json({
+            const user = await User.findById(req.user._id).select("-password");
+             res.status(200).json({
                   success: true,
                   user
             })
@@ -23,17 +23,17 @@ export const getprofile = async (req, res) => {
 //to get public profile
 export const publicprofile = async (req, res) => {
       try {
-            const user = User.findById(req.params.id).selecting("name profilepic role createdat");
+            const user = await User.findById(req.params.id).select("name profilePic role createdAt");
             if (!user) {
                   throw new ApiError(404, "user not found")
             }
-            res.staus(200).json({
+            res.status(200).json({
                   success: true,
                   user
             })
 
       } catch (error) {
-             res.staus(500).json({
+             res.status(500).json({
                   success: false,
                   message: error.message
             })
@@ -63,14 +63,17 @@ export const updateprofile = async (req, res) => {
             if (address !== undefined) user.address = address;
             
             const updateuser = await user.save();
+            const safeUser = updateuser.toObject();
+            delete safeUser.password;
+
             res.json({
                   success: true,
                   message: "Profile pic update successfully",
-                  user: updateuser
+                  user: safeUser
             })
 
       } catch (error) {
-             res.staus(500).json({
+             res.status(500).json({
                   success: false,
                   message: error.message
             })

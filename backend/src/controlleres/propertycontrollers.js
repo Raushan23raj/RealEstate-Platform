@@ -331,10 +331,10 @@ export const getpropertydetails = async (req, res) => {
       try {
             const property = await Property.findById(req.params.id).populate(
                   "seller",
-                  "name email phone profilepic"
+                  "name email phone profilePic"
             )
             if (!property) {
-                  return res.status(500).json({
+                  return res.status(404).json({
                         success: false,
                         message: "Property not found"
                   })
@@ -352,7 +352,10 @@ export const getpropertydetails = async (req, res) => {
                         //ignore invalid token
                   }
             }
-            const issellerchecking = visitorId === property.seller._id.toString();
+            const issellerchecking = property.seller
+                  ? visitorId === property.seller._id.toString()
+                  : false;
+
             //only increment view if not the seller
             if (!issellerchecking && !property.viewedBy.includes(visitorId)) {
                   property.views += 1;
@@ -368,12 +371,12 @@ export const getpropertydetails = async (req, res) => {
                   status: property.status
             })
                   .limit(4)
-                  .select("title price image city area propertyType bhk areaSize status");
+                  .select("title price images city area propertyType bhk areaSize status");
             
             res.json({
                   success: true,
                   property,
-                  similarproperties
+                  similarProperties: similarproperties
             });
 
       } catch (error) {
