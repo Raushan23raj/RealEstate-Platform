@@ -244,7 +244,7 @@ const Landingpages = () => {
                                           </div>
                                           <div>
                                                 <h4 className={s.badgeTitle}>Verified Listing</h4>
-                                                <p className={s.badgeText}>Inspected by our professional tema</p>
+                                                <p className={s.badgeText}>Inspected by our professional team</p>
                                           </div>
                                           <span className={s.preApproved}>Pre-Approved</span>
                                     </div>

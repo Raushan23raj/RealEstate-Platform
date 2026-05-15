@@ -9,6 +9,11 @@ import Register from './pages/auth/Register.jsx'
 import VerifyEmail from './pages/auth/VerifyEmail.jsx'
 import ForgotPassword from './pages/auth/ForgotPassword.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
+import Profile from './pages/shared/Profile.jsx'
+import AdminLayout from './components/AdminLayout.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminUsers from './pages/admin/AdminUsers.jsx'
+import SellerRequest from './pages/admin/SellerRequest.jsx'
 
 function App() {
   return (
@@ -22,6 +27,13 @@ function App() {
         <Route path="/" element={<Landingpages />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
+        <Route path="/profile" element={<Profile />} />
+        
+        <Route element={<AdminLayout />}>
+        <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/seller-requests" element={<SellerRequest/>}/>
+      </Route>
       </Routes>
     </div>
   )
