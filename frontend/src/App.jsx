@@ -14,6 +14,11 @@ import AdminLayout from './components/AdminLayout.jsx'
 import AdminDashboard from './pages/admin/AdminDashboard.jsx'
 import AdminUsers from './pages/admin/AdminUsers.jsx'
 import SellerRequest from './pages/admin/SellerRequest.jsx'
+import AdminProperties from './pages/admin/AdminProperties.jsx'
+import AdminInquiries from './pages/admin/AdminInquiries.jsx'
+import AdminContact from './pages/admin/AdminContact.jsx'
+import SellerLayout from './components/SellerLayout.jsx'
+import SellerDashboard from './pages/Seller/SellerDashboard.jsx'
 
 function App() {
   return (
@@ -29,10 +34,18 @@ function App() {
         <Route path="/property/:id" element={<PropertyDetails />} />
         <Route path="/profile" element={<Profile />} />
         
+        <Route element={<SellerLayout />}>
+          <Route path="/dashboard" element={<SellerDashboard/>}/>
+        </Route>
+
         <Route element={<AdminLayout />}>
         <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
           <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/seller-requests" element={<SellerRequest/>}/>
+          <Route path="/admin/seller-requests" element={<SellerRequest />} />
+          <Route path="/admin/properties" element={<AdminProperties />} />
+          <Route path="/admin/inquiries" element={<AdminInquiries />} />
+          <Route path="/admin/contacts" element={<AdminContact/>}/>
+
       </Route>
       </Routes>
     </div>

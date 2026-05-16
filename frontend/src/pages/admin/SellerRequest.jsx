@@ -35,11 +35,11 @@ const SellerRequest = () => {
       const handleApprove = async (id) => {
             try {
                   const res = await axios.patch(
-                        `${API_URL}/api/admin/approve-seller/${id}`, {},
+                        `${API_URL}/api/admin/approved-seller/${id}`, {},
                         { headers: { Authorization: `Bearer ${token}` } },
                   );
                   if (res.data.success) {
-                        setRequests(requests.filter((req) => req._id !== id));
+                        setRequests((prev) => prev.filter((req) => req._id !== id));
                         alert("Seller Approved Successfully!")
                   }
             } catch (error) {
