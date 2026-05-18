@@ -31,7 +31,7 @@ const Navbar = () => {
                               <Link to="/wishlist" className={s.navLink} onClick={() => setIsOpen(false)}>
                                     Wishlist
                               </Link>
-                              <Link to="/chat" className={s.navLink} onClick={() => setIsOpen(false)}>
+                              <Link to="/chat-messages" className={s.navLink} onClick={() => setIsOpen(false)}>
                                     Messages
                               </Link>
                               <Link to="/contact" className={s.navLink} onClick={() => setIsOpen(false)}>
