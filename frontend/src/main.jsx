@@ -7,7 +7,9 @@ import { AuthPorvider } from './context/authcontext'
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthPorvider>
-      <App/>
+      <chatProvider>
+        <App/>
+      </chatProvider>  
     </AuthPorvider>
   </BrowserRouter>
   

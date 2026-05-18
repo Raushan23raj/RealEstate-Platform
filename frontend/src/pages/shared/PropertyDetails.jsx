@@ -123,7 +123,7 @@ const PropertyDetails = () => {
                   const chat = res.data;
 
                   await axios.post(
-                        `${API_URL}/api/chat/send`,
+                        `${API_URL}/api/chat/send/${chat._id}`,
                         {
                               chatId: chat._id,
                               text: `(context: Interested in property "${property.title}")`,
@@ -131,7 +131,7 @@ const PropertyDetails = () => {
                         },
                         { headers: { Authorization: `Bearer ${token}` } }
                   );
-                  navigate("/chat-message", { state: { chat } });
+                  navigate("/chat-messages", { state: { chat } });
             } catch (error) {
                   console.error("Error starting chat:", error);
                   alert("Failed to start chat");

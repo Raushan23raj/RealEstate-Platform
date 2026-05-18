@@ -23,41 +23,48 @@ const SellerDashboard = () => {
       const [loading, setLoading] = useState(true);
       const [searchTerm, setSearchTerm] = useState("");
 
+      const fetchDashboardData = async () => {
+            try {
+                  const [statsRes, propsRes, inqRes] = await Promise.all([
+                        axios.get(`${API_URL}/api/property/seller/dashboard`, {
+                              headers: { Authorization: `Bearer ${token}` },
+                        }),
+                        axios.get(`${API_URL}/api/property/my`, {
+                              headers: { Authorization: `Bearer ${token}` },
+                        }),
+                        axios.get(`${API_URL}/api/inquiry/seller`, {
+                              headers: { Authorization: `Bearer ${token}` },
+                        }),
+                  ]);
+                  const dashboardStats = statsRes.data.status || statsRes.data.stats || statsRes.data;
+                  setStats({
+                        totalproperties: dashboardStats.totalProperties ?? dashboardStats.totalproperties ?? 0,
+                        activeListings: dashboardStats.activeListing ?? dashboardStats.activeListings ?? 0,
+                        soldProperties: dashboardStats.soldProperties ?? 0,
+                        totalInquiries: dashboardStats.totalEnquiry ?? dashboardStats.totalInquiries ?? 0,
+                        totalViews: dashboardStats.totalViews ?? 0,
+                  });
+                  const props = Array.isArray(propsRes.data)
+                        ? propsRes.data
+                        : propsRes.data.properties || [];
+                  setProperties(props);
+                  setInquires(
+                        Array.isArray(inqRes.data.inquires)
+                              ? inqRes.data.inquires.slice(0, 3)
+                              : Array.isArray(inqRes.data)
+                                    ? inqRes.data.slice(0, 3)
+                                    : []
+                  );
+            } catch (error) {
+                  console.error("Failed to load dashboard data:", error);
+            } finally {
+                  setLoading(false);
+            }
+      };
+
       //to fetch all data
       useEffect(() => {
-            const fetchData = async () => {
-                  try {
-                        const [statsRes, propsRes, inqRes] = await Promise.all([
-                              axios.get(`${API_URL}/api/property/seller/dashboard`, {
-                                    headers: { Authorization: `Bearer ${token}` },
-                              }),
-                              axios.get(`${API_URL}/api/property/my`, {
-                                    headers: { Authorization: `Bearer ${token}` },
-                              }),
-                              axios.get(`${API_URL}/api/inquiry/seller`, {
-                                    headers: { Authorization: `Bearer ${token}` },
-                              }),
-                        ]);
-                        setStats(statsRes.data.stats || statsRes.data);
-                        const props = Array.isArray(propsRes.data)
-                              ? propsRes.data
-                              : propsRes.data.properties || [];
-                        setProperties(props);
-                        setInquires(
-                              Array.isArray(inqRes.data.inquires)
-                                    ? inqRes.data.inquires.slice(0, 3)
-                                    : Array.isArray(inqRes.data)
-                                          ? inqRes.data.slice(0, 3)
-                                          : []
-                        );
-                        setLoading(false);
-
-                  } catch (error) {
-                        console.error("Failed to load dashboard data:", error);
-                        setLoading(false);
-                  }
-            };
-            fetchData();
+            fetchDashboardData();
       }, [token]);
 
       //to delete a property
@@ -76,7 +83,7 @@ const SellerDashboard = () => {
 
       //to update status (make it sold or for sale)
       const handle = async (id, currentStatus) => {
-            const newStatus = currentStatus === "Sold" ? "sale" : "sold";
+            const newStatus = currentStatus?.toLowerCase() === "sold" ? "sale" : "sold";
 
             try {
                   await axios.patch(
@@ -87,9 +94,7 @@ const SellerDashboard = () => {
                   },
                   );
 
-                  setProperties(
-                        properties.map((p) => (p._id === id ? { ...p, status: newStatus } : p)),
-                  );
+                  await fetchDashboardData();
             } catch (error) {
                   alert("Failed to update status.");
             }
@@ -231,7 +236,7 @@ const filteredProperties = Array.isArray(properties)
                                                                     <HiOutlineCheckCircle size={14} />{" "}
                                                                     {p.status === "sold" ? "Available" : "Sold"}
                                                               </button>
-                                                              <Link to={`edit-property/${p._id}`} className={s.editButton}>
+                                                              <Link to={`/edit-property/${p._id}`} className={s.editButton}>
                                                                     <HiOutlinePencilAlt size={14}/> Edit
                                                               </Link>
                                                               <button onClick={() => handleDelete(p._id)} className={s.deleteButton}>
