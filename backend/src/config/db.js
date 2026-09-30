@@ -7,9 +7,6 @@ const connectDB = async () => {
     const options = {
       serverSelectionTimeoutMS: 3000,
     };
-    const databaseName = process.env.MONGODB_DB_NAME?.trim();
-    if (databaseName) options.dbName = databaseName;
-
     await mongoose.connect(mongoUri, options);
     console.log("MongoDB Connected");
   } catch (error) {
