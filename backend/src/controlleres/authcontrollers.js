@@ -6,6 +6,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
+const sendVerificationEmail = (email, verificationToken) => sendemail({
+      email,
+      subject: "Verify Your Email-RealState Platform",
+      message: `<p>Your Email id code is:<strong>${verificationToken}</strong></p><p>Please Enter this code on the verfication page to activate your account</p>`
+});
+
 export const registeruser = async (req, res) => {
       try {
             const { name, email, password, role } = req.body;
@@ -13,7 +19,19 @@ export const registeruser = async (req, res) => {
             const existinguser = await User.findOne({ email });
              
             if (existinguser) {
-                  throw new ApiError(400,"Email Already Registered")
+                  if (existinguser.isVerified) {
+                        throw new ApiError(400,"Email Already Registered")
+                  }
+
+                  const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+                  await sendVerificationEmail(email, verificationToken);
+                  existinguser.verificationToken = verificationToken;
+                  await existinguser.save();
+
+                  return res.status(200).json({
+                        message: "A new verification code was sent to your email.",
+                        user: { email: existinguser.email, name: existinguser.name, role: existinguser.role }
+                  });
             }
 
             const hashedpassword = await bcrypt.hash(password, 10);
@@ -30,18 +48,17 @@ export const registeruser = async (req, res) => {
             })
 
             try {
-                  await sendemail({
-                        email,
-                        subject: "Verify Your Email-RealState Platform",
-                        message: `<p>Your Email id code is:<strong>${verificationToken}</strong></p><p>Please Enter this code on the verfication page to activate your account</p>`
-                  })
+                  await sendVerificationEmail(email, verificationToken);
             } catch (emailError) {
                   console.error("Fail to send verfication email:", emailError)
+                  return res.status(500).json({
+                        message: "Registration succeeded, but the verification email could not be sent. Please contact support or try again later."
+                  });
             }
-            
+
             res.status(201).json({
                   message: "User Registered. Please check your email for the verfication code.",
-                  user: {email: user.email, name:user.name, role:user.role}
+                  user: { email: user.email, name: user.name, role: user.role }
             })
 
       } catch (error) {

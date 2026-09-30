@@ -15,3 +15,11 @@ test('falls back to EMAIL_USER when Brevo sender is absent', () => {
 
   assert.equal(getBrevoSenderEmail(), 'raushanlakh@gmail.com');
 });
+
+test('accepts lowercase Brevo environment variable names', () => {
+  delete process.env.BREVO_SENDER_EMAIL;
+  delete process.env.EMAIL_USER;
+  process.env.brevo_sender_email = 'lowercase@realstate.com';
+
+  assert.equal(getBrevoSenderEmail(), 'lowercase@realstate.com');
+});

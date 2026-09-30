@@ -1,19 +1,44 @@
-import { json } from "express";
 import { ApiError } from "./ApiError.js";
+
+const getEnvValue = (...keys) => {
+      for (const key of keys) {
+            const value = process.env[key];
+            if (typeof value === "string" && value.trim()) return value.trim();
+      }
+
+      for (const [envKey, value] of Object.entries(process.env || {})) {
+            const normalized = envKey.toUpperCase();
+            const match = keys.some((key) => key.toUpperCase() === normalized);
+            if (match && typeof value === "string" && value.trim()) {
+                  return value.trim();
+            }
+      }
+
+      return undefined;
+};
+
+export const getBrevoSenderEmail = () =>
+      getEnvValue("BREVO_SENDER_EMAIL", "brevo_sender_email", "EMAIL_USER", "email_user");
 
 const sendemail = async (options) => {
       try {
-            const BREVO_API_KEY = process.env.BREVO_API_KEY?.trim();
-            
+            const BREVO_API_KEY = getEnvValue("BREVO_API_KEY", "brevo_api_key");
+            const senderEmail = getBrevoSenderEmail();
+
             if (!BREVO_API_KEY) {
                   console.log("Missing BREVO_API_KEY in the .env files")
-                  throw new ApiError(400,"Missing Email api key")
+                  throw new ApiError(400, "Missing Email api key")
             }
-           
+
+            if (!senderEmail) {
+                  console.log("Missing sender email in the .env files")
+                  throw new ApiError(400, "Missing sender email")
+            }
+
             const data = {
                   sender: {
                         name: "Real State Platform",
-                        email: process.env.EMAIL_USER
+                        email: senderEmail
                   },
                   to: [{ email: options.email }],
                   subject: options.subject,
@@ -34,17 +59,16 @@ const sendemail = async (options) => {
 
             if (response.ok) {
                   console.log("Email send successfully by Brevo", result.messageId);
-            }
-            else {
-                  console.error("Brevo api key error")
-                  throw new ApiError(500,result.message ||"couldn't send email by Brevo")
+                  return result;
             }
 
+            console.error("Brevo API rejected the email request:", result);
+            throw new ApiError(500, result.message || "couldn't send email by Brevo");
+
       } catch (error) {
-            console.error("Brevo Email Eror")
-            throw new ApiError(500,"couldn't send email by Brevo")
+            console.error("Brevo Email Error:", error?.message || error);
+            throw new ApiError(500, error?.message || "couldn't send email by Brevo");
       }
-      
 }
 
 export { sendemail }
