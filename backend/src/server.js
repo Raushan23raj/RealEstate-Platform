@@ -31,11 +31,8 @@ await connectDB();
 const allowedOrigins = [
     process.env.CLIENT_URL,
     process.env.FRONTEND_URL,
-    "https://realestate-platformfrontend.onrender.com",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:4173",
-    "http://127.0.0.1:4173"
+    "https://real-estate-platform-gray-nu.vercel.app",
+    "https://realestate-platform-kr1q.onrender.com"
 ].filter(Boolean);
 
 const isAllowedOrigin = (origin) => {
@@ -96,7 +93,13 @@ const httpServer = http.createServer(app);
 //socket .io setup
 const io = new Server(httpServer, {
       cors: {
-            origin: allowedOrigins,
+            origin: function (origin, callback) {
+                  if (isAllowedOrigin(origin)) {
+                        callback(null, true);
+                  } else {
+                        callback(new Error("Not allowed by CORS"));
+                  }
+            },
             methods: ["GET", "POST"],
       }
 })
